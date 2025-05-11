@@ -26,7 +26,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const saved = localStorage.getItem("employees");
-    if (saved) {
+    if (!saved) {
       setEmployees(JSON.parse(saved));
     } else {
       setEmployees(initialEmployees);
