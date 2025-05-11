@@ -22,6 +22,9 @@ export default function Navbar() {
   };
 
   const isDisabled = (targetRole) => {
+    // CEO бол бүх меню идэвхтэй байна
+    if (user?.role === "ceo") return "";
+    // Бусад рольд зөвхөн өөрийнх нь меню идэвхтэй
     return user?.role !== targetRole ? "pointer-events-none opacity-50" : "";
   };
 
@@ -154,7 +157,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {isMobileMenuOpen && user && (
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1">
-          {user.role === "admin" && (
+          {(user.role === "admin" || user.role === "ceo") && (
             <Link
               to="/admin"
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700"
@@ -163,7 +166,7 @@ export default function Navbar() {
               Админ
             </Link>
           )}
-          {user.role === "manager" && (
+          {(user.role === "manager" || user.role === "ceo") && (
             <Link
               to="/manager"
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700"
@@ -172,7 +175,7 @@ export default function Navbar() {
               Төслийн удирдагч
             </Link>
           )}
-          {user.role === "employee" && (
+          {(user.role === "employee" || user.role === "ceo") && (
             <Link
               to="/employee"
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700"

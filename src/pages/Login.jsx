@@ -95,6 +95,7 @@ export default function Login() {
               <option value="admin">Админ</option>
               <option value="manager">Удирдагч</option>
               <option value="employee">Ажилтан</option>
+              <option value="ceo">Захирал</option>
             </select>
           </div>
         </div>
