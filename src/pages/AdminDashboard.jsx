@@ -24,7 +24,6 @@ export default function AdminDashboard() {
     languages: {},
   });
 
-  // LocalStorage-оос мэдээлэл унших
   useEffect(() => {
     const saved = localStorage.getItem("employees");
     if (saved) {
@@ -34,7 +33,6 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  // Calculate stats
   useEffect(() => {
     const total = employees.length;
     const male = employees.filter((emp) => emp.gender === "эрэгтэй").length;
@@ -48,7 +46,6 @@ export default function AdminDashboard() {
       (emp) => emp.medicalConditions.length > 0
     ).length;
 
-    // Count languages
     const languageCounter = {};
     employees.forEach((emp) => {
       emp.languages.forEach((lang) => {
@@ -67,7 +64,6 @@ export default function AdminDashboard() {
     });
   }, [employees]);
 
-  // LocalStorage-д хадгалах
   useEffect(() => {
     localStorage.setItem("employees", JSON.stringify(employees));
   }, [employees]);

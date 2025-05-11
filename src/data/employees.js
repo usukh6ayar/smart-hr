@@ -1,5 +1,3 @@
-// src/data/employees.js
-
 export const employees = [
   {
     id: 1,

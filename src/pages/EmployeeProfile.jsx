@@ -12,7 +12,6 @@ export default function EmployeeProfile({ employeeId }) {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Load employee data from localStorage
   useEffect(() => {
     const employees = JSON.parse(localStorage.getItem("employees") || "[]");
     const currentEmployee = employees.find((emp) => emp.id === employeeId);

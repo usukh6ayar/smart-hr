@@ -1,4 +1,3 @@
-// src/pages/ManagerDashboard.jsx
 import { useState } from "react";
 import { employees } from "../data/employees";
 
