@@ -1,0 +1,44 @@
+// src/data/employees.js
+
+export const employees = [
+  {
+    id: 1,
+    name: "Батжав Ганчимэг",
+    age: 32,
+    gender: "эмэгтэй",
+    kids: 3,
+    isSingleParent: true,
+    medicalConditions: ["даралт", "сахар"],
+    languages: ["монгол", "англи"],
+  },
+  {
+    id: 2,
+    name: "Дорж Ганболд",
+    age: 28,
+    gender: "эрэгтэй",
+    kids: 0,
+    isSingleParent: false,
+    medicalConditions: [],
+    languages: ["монгол", "хятад"],
+  },
+  {
+    id: 3,
+    name: "Саранчимэг Бат-Эрдэнэ",
+    age: 40,
+    gender: "эмэгтэй",
+    kids: 2,
+    isSingleParent: false,
+    medicalConditions: ["цөс"],
+    languages: ["монгол"],
+  },
+  {
+    id: 4,
+    name: "Энхболд Мөнхбат",
+    age: 35,
+    gender: "эрэгтэй",
+    kids: 1,
+    isSingleParent: true,
+    medicalConditions: ["сахар"],
+    languages: ["монгол", "англи", "хятад"],
+  },
+];
