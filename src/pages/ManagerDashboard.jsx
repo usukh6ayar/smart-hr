@@ -19,7 +19,37 @@ export default function ManagerDashboard() {
   }, []);
 
   const handleCreateProject = (project) => {
-    const updated = [...projects, { ...project, selectedEmployees: [] }];
+    // Шинэ төслийн шалгуур авах
+    const criteria = project.criteria;
+    // Ажилтнуудыг оноогоор шүүх функц
+    const scoreEmployee = (emp) => {
+      if (!criteria) return 0;
+      let score = 100;
+      if (criteria.avoidSingleParent && emp.isSingleParent) score -= 30;
+      if (emp.kids >= criteria.avoidManyKids) score -= 20;
+      if (criteria.avoidMedical.length > 0) {
+        emp.medicalConditions.forEach((cond) => {
+          if (criteria.avoidMedical.includes(cond)) score -= 15;
+        });
+      }
+      if (criteria.requiredLanguages.length > 0) {
+        const knowsLang = criteria.requiredLanguages.some((lang) =>
+          emp.languages.includes(lang)
+        );
+        if (!knowsLang) score -= 25;
+      }
+      return score;
+    };
+    // Автоматаар сонгох (оноо 70-аас дээш)
+    const autoSelected = employees
+      .map((emp) => ({ ...emp, score: scoreEmployee(emp) }))
+      .filter((emp) => emp.score >= 70)
+      .map((emp) => emp.id);
+
+    const updated = [
+      ...projects,
+      { ...project, selectedEmployees: autoSelected },
+    ];
     setProjects(updated);
     localStorage.setItem("projects", JSON.stringify(updated));
     setSelectedProjectId(project.id);
@@ -54,6 +84,7 @@ export default function ManagerDashboard() {
     });
     setProjects(updatedProjects);
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
+    console.log("Сонгогдсон ажилтнууд:", tempSelectedEmployees);
   };
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
@@ -103,7 +134,7 @@ export default function ManagerDashboard() {
       {!showForm && (
         <>
           <div className="mb-6 bg-white rounded shadow p-4">
-            <h2 className="text-lg font-semibold mb-3">📋 Бүх төслүүд</h2>
+            <h2 className="text-lg font-semibold mb-3">Бүх төслүүд</h2>
             {projects.length === 0 ? (
               <p className="text-gray-500">Одоогоор бүртгэгдсэн төсөл алга.</p>
             ) : (
@@ -123,12 +154,15 @@ export default function ManagerDashboard() {
                         className="font-semibold flex-1"
                       >
                         {proj.title}
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({proj.selectedEmployees?.length || 0} ажилтан)
+                        </span>
                       </div>
                       <button
                         onClick={() => handleDeleteProject(proj.id)}
-                        className="text-sm text-red-500 hover:text-red-700 ml-4"
+                        className="text-sm bg-red-50 text-red-600 px-3 py-1 rounded-lg hover:bg-red-100 hover:text-red-700 transition font-semibold shadow-sm"
                       >
-                        🗑 Устгах
+                        Устгах
                       </button>
                     </div>
                   </li>
@@ -139,20 +173,25 @@ export default function ManagerDashboard() {
 
           <button
             onClick={() => setShowForm(true)}
-            className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="mb-6 bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition font-semibold active:scale-95"
           >
             + Шинэ төсөл үүсгэх
           </button>
         </>
       )}
 
-      {showForm && <ProjectForm onCreate={handleCreateProject} />}
+      {showForm && (
+        <ProjectForm
+          onCreate={handleCreateProject}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
       {selectedProject && (
         <>
           <div className="bg-white rounded shadow p-6 mb-4">
             <h2 className="text-xl font-semibold mb-2">
-              🧾 {selectedProject.title}
+              {selectedProject.title}
             </h2>
             <p className="text-sm text-gray-600 mb-4">
               Түр сонгогдсон ажилтан: {tempSelectedEmployees.length}
@@ -161,15 +200,15 @@ export default function ManagerDashboard() {
             <div className="flex justify-between items-center mb-4">
               <button
                 onClick={handleSaveSelectedEmployees}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-300 transition font-semibold active:scale-95"
               >
-                ✅ Хадгалах
+                Хадгалах
               </button>
               <button
                 onClick={() => setSelectedProjectId(null)}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition font-medium shadow"
               >
-                ⬅ Буцах
+                Буцах
               </button>
             </div>
 
@@ -198,10 +237,21 @@ export default function ManagerDashboard() {
 
             {selectedEmployeesList.length > 0 && (
               <div className="bg-teal-50 border-l-4 border-teal-500 p-4 mb-6 rounded">
-                <h3 className="font-semibold mb-2">📌 Сонгогдсон ажилтнууд</h3>
+                <h3 className="font-semibold mb-2">Сонгогдсон ажилтнууд</h3>
                 <ul className="list-disc list-inside text-sm text-teal-900">
                   {selectedEmployeesList.map((e) => (
-                    <li key={e.id}>{e.name}</li>
+                    <li
+                      key={e.id}
+                      className="flex items-center justify-between"
+                    >
+                      <span>{e.name}</span>
+                      <button
+                        onClick={() => handleToggleTempEmployee(e.id)}
+                        className="ml-2 text-xs bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition font-semibold shadow-sm"
+                      >
+                        Хасах
+                      </button>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -239,7 +289,7 @@ export default function ManagerDashboard() {
                       </div>
                       <button
                         onClick={() => handleToggleTempEmployee(emp.id)}
-                        className={`text-sm px-3 py-1 rounded ${
+                        className={`text-sm px-4 py-1 rounded-full font-semibold shadow-sm transition ${
                           isSelected
                             ? "bg-red-500 text-white hover:bg-red-600"
                             : "bg-teal-600 text-white hover:bg-teal-700"
